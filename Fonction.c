@@ -82,7 +82,7 @@ void RemplirCentre(CENTRE*centre){
     scanf("%d",&centre->NbAmbulances);
     printf("Saisire nombre des Personnel : ");
     scanf("%d",&centre->NbPersonel);
-    AllocationAmbulance(&centre->ambulances,centre->NbAmbulances);\
+    AllocationAmbulance(&centre->ambulances,centre->NbAmbulances);
     AllocationPersonel(&centre->personnel,centre->NbPersonel);
     for (int i =0;i<centre->NbAmbulances;i++){
         RemplirAmbulance(centre,i);
@@ -121,18 +121,18 @@ void RemplireFichierduTableau(CENTRE*centre){
     fclose(f);
     }
 
+
 void RemplireTableauDuFichier(CENTRE*centre){
     FILE* f = fopen("centre.bin","rb");
     fread(&centre->NbAmbulances,sizeof(int),1,f);
     fread(&centre->NbPersonel,sizeof(int),1,f);
     AllocationAmbulance(&centre->ambulances,centre->NbAmbulances);
-    if (!centre->ambulances) printf("error d'allocation d'ambulance\n");
+    AllocationPersonel(&centre->personnel,centre->NbPersonel);
     for (int i = 0 ;i<centre->NbAmbulances;i++){
         fread(centre->ambulances[i].Imatriculation,sizeof(char),10,f);
-        fread(centre->ambulances[i].Conducteur,sizeof(char),15,f);
+        fread(centre->ambulances[i].Conducteur,sizeof(char),10,f);
         fread(&centre->ambulances[i].NbMissions,sizeof(int),1,f);
         AllocationMission(&centre->ambulances[i].mission,centre->ambulances[i].NbMissions);
-        if (!centre->ambulances[i].mission) printf("Error d'allocation du mission");
         for (int j =0;j<centre->ambulances[i].NbMissions;j++){
             fread(&centre->ambulances[i].mission[j].Date.jour,sizeof(int),1,f);
             fread(&centre->ambulances[i].mission[j].Date.mois,sizeof(int),1,f);
@@ -143,19 +143,18 @@ void RemplireTableauDuFichier(CENTRE*centre){
             fread(&centre->ambulances[i].mission[j].Patient.Age.mois,sizeof(int),1,f);
             fread(&centre->ambulances[i].mission[j].Patient.Age.annee,sizeof(int),1,f);
             fread(centre->ambulances[i].mission[j].Patient.Nom,sizeof(char),20,f);
-            fread(&centre->ambulances[i].mission[j].Patient.Maladie,sizeof(char),15,f);
+            fread(centre->ambulances[i].mission[j].Patient.Maladie,sizeof(char),15,f);
         }    
     }
-    if (!centre->personnel) printf("error d'allocation personnel");
-    AllocationPersonel(&centre->personnel,centre->NbPersonel);
     for (int i = 0;i<centre->NbPersonel;i++){
         fread(centre->personnel[i].Nom,sizeof(char),10,f);
         fread(centre->personnel[i].Role,sizeof(char),15,f);
         fread(&centre->personnel[i].Telephone,sizeof(int),1,f);
     }
     fclose(f);
+    }
 
-}
+
 
 void LibereMemoire(CENTRE*centre){
     for (int i = 0;i<centre->NbAmbulances;i++){
@@ -478,3 +477,73 @@ void AfficherPatient(CENTRE*centre){
     ,centre->ambulances[indC].mission[indM].Patient.Age.annee);
     printf("Maladie du patient : %s\n",centre->ambulances[indC].mission[indM].Patient.Maladie);
 }
+void PatientPlusJeune(CENTRE *centre) {
+    int minAgeTotal = INT_MAX;
+    PATIENT patientMin;
+
+    int agePatientEnJours;
+    int ageReference;
+    for (int i = 0; i < centre->NbAmbulances; i++) {
+        for (int j = 0; j < centre->ambulances[i].NbMissions; j++) {
+            ageReference = 2024 * 365;
+            agePatientEnJours = ageReference -
+                                (centre->ambulances[i].mission[j].Patient.Age.annee * 365 +
+                                 centre->ambulances[i].mission[j].Patient.Age.mois * 30 +
+                                 centre->ambulances[i].mission[j].Patient.Age.jour);
+
+            if (agePatientEnJours < minAgeTotal) {
+                minAgeTotal = agePatientEnJours;
+                patientMin = centre->ambulances[i].mission[j].Patient;
+            }
+        }
+    }
+
+    if (minAgeTotal == INT_MAX) {
+        printf("Aucun patient enregistré.\n");
+        return;
+    }
+    printf("Le patient le plus jeune est :\n");
+    printf("Nom : %s\n", patientMin.Nom);
+    printf("Date de naissance : %02d/%02d/%04d\n",
+           patientMin.Age.jour,
+           patientMin.Age.mois,
+           patientMin.Age.annee);
+    printf("Maladie : %s\n", patientMin.Maladie);
+}
+
+void AmbulancePlusDeMissions(CENTRE *centre) {
+    int maxMissions = 0; 
+    int indexAmbulanceMax = -1; 
+
+    for (int i = 0; i < centre->NbAmbulances; i++) {
+        int nbMissions = centre->ambulances[i].NbMissions;
+        if (nbMissions > maxMissions) {
+            maxMissions = nbMissions;
+            indexAmbulanceMax = i;
+        }
+    }
+    if (indexAmbulanceMax != -1) {
+        printf("L'ambulance ayant effectué le plus de missions est l'ambulance #%d.\n", indexAmbulanceMax + 1);
+        printf("Nombre de missions : %d\n", maxMissions);
+    } else {
+        printf("Aucune mission n'a été effectuée par les ambulances.\n");
+    }
+}
+
+void NombrePatientsAvecMaladie(CENTRE *centre) {
+    int compteur = 0;
+    char Maladie[50];
+    printf("Donner une maladie : ");
+    scanf("%49s",Maladie);
+    for (int i = 0; i < centre->ambulances->NbMissions; i++) {
+        for (int j = 0;j<centre->ambulances[i].NbMissions;j++){
+            if (strcmp(centre->ambulances[i].mission[j].Patient.Maladie, Maladie) == 0) {
+            compteur++;
+            }
+        }
+    }
+    printf("Il y a %d patient qui ont %s\n",compteur,Maladie);
+}
+
+
+

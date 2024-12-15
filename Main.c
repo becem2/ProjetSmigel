@@ -153,7 +153,37 @@ int main(){
                 }
             } while (ChoixModification != 9);
             break;
-
+        case 2:
+            int ChoixTraitement;
+            do {
+                printf("\n*---------------Traitement-----------------*\n");
+                printf("1. Patient le plus jeune\n");
+                printf("2. Mission la plus frequente\n");
+                printf("3. Ambulance ayant effectuee plus de mission\n");
+                printf("4. Ville plus frequente\n");
+                printf("5. Maladie specifier\n");
+                printf("Tapez votre choix : ");
+                scanf("%d",&ChoixTraitement);
+                switch (ChoixTraitement)
+                {
+                case 1:
+                    PatientPlusJeune(centre);
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    AmbulancePlusDeMissions(centre);
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    NombrePatientsAvecMaladie(centre);
+                    break;
+                default:
+                    break;
+                }
+            } while(ChoixTraitement !=9);
+            break;
         case 3:
             int ChoixAffichage;
             do {
@@ -184,7 +214,11 @@ int main(){
                 }
             } while (ChoixAffichage != 9);
             break;
-
+        case 4:
+            RemplireFichierduTableau(centre);
+            LibereMemoire(centre);
+            RemplireTableauDuFichier(centre);
+            break;
         case 9:
             break;
 
@@ -194,7 +228,6 @@ int main(){
         }
 
     } while (ChoixMenu != 9);
-
     RemplireFichierduTableau(centre);
     LibereMemoire(centre);
     getch();

@@ -27,3 +27,7 @@ void AfficherAmbulance(CENTRE*centre);
 void AfficherMission(CENTRE*centre);
 void AfficherPersonel(CENTRE*centre);
 void AfficherPatient(CENTRE*centre);
+
+void PatientPlusJeune(CENTRE *centre);
+void AmbulancePlusDeMissions(CENTRE *centre);
+void NombrePatientsAvecMaladie(CENTRE *centre);
