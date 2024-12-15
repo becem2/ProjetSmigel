@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "fonction.c": "cpp",
+        "stdlib.h": "c"
+    }
+}
